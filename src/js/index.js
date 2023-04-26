@@ -1,4 +1,4 @@
-const { Song, Playlist } = require('./classes.js');
+const { Song, Playlist } = require("./classes.js");
 
 /**
  * Retrieves a list of songs from the Genius API based on a search query
@@ -6,7 +6,7 @@ const { Song, Playlist } = require('./classes.js');
  * @param {string} query - The search query for songs
  * @returns {Promise<Array>} - A Promise that resolves to an array of unique songs matching the search query
  */
-async function getSongsList(query) {
+function getSongsList(query) {
   // Encode the search query to include special characters
   const encodedName = encodeURIComponent(query);
 
@@ -14,15 +14,20 @@ async function getSongsList(query) {
   const url = `https://genius.com/api/search/songs?q=${encodedName}&limit=10`;
 
   // Call the Genius API search endpoint and get the response as JSON
-  const response = await fetch(url);
+  const response = fetch(url);
   const jsonResponse = response.json();
 
   console.log(jsonResponse);
 
   // Extract the songs from the response and map them to a new object with just their name and ID
-  return jsonResponse.response.sections[0].hits.map((song) => (
-    new Song(song.result.title, song.result.artist_names, song.result.song_art_image_url)
-  ));
+  return jsonResponse.response.sections[0].hits.map(
+    (song) =>
+      new Song(
+        song.result.title,
+        song.result.artist_names,
+        song.result.song_art_image_url
+      )
+  );
 }
 
 async function buttonTrigger(clickEvent) {
@@ -46,7 +51,10 @@ async function buttonTrigger(clickEvent) {
     svg.parentNode.className = "song-remove-btn";
     svg.setAttribute("viewBox", "0 0 1024 1024");
     const path = svg.querySelector("g>path");
-    path.setAttribute("d", "M512 1024C229.248 1024 0 794.752 0 512S229.248 0 512 0s512 229.248 512 512-229.248 512-512 512z m0-896C299.968 128 128 299.968 128 512s171.968 384 384 384 384-171.968 384-384S724.032 128 512 128z m192 448H320a64 64 0 1 1 0-128h384a64 64 0 0 1 64 64c0 35.392-28.608 64-64 64z");
+    path.setAttribute(
+      "d",
+      "M512 1024C229.248 1024 0 794.752 0 512S229.248 0 512 0s512 229.248 512 512-229.248 512-512 512z m0-896C299.968 128 128 299.968 128 512s171.968 384 384 384 384-171.968 384-384S724.032 128 512 128z m192 448H320a64 64 0 1 1 0-128h384a64 64 0 0 1 64 64c0 35.392-28.608 64-64 64z"
+    );
 
     playlistTracklistElem.append(songElem);
   } else {
@@ -74,13 +82,17 @@ async function buttonTrigger(clickEvent) {
   const song = new Song(
     songElem.querySelector(".song-name").innerText,
     songElem.querySelector(".song-artists").innerText,
-    songElem.querySelector(".song-image").src,
+    songElem.querySelector(".song-image").src
   );
 
   if (addCase) {
     playlist.songs.push(song);
   } else {
-    playlist.songs = playlist.songs.filter((playlistSong) => playlistSong.title !== song.title && playlistSong.artists !== song.artists);
+    playlist.songs = playlist.songs.filter(
+      (playlistSong) =>
+        playlistSong.title !== song.title &&
+        playlistSong.artists !== song.artists
+    );
   }
 
   document.cookie = `playlist=${JSON.stringify(playlist)};max-age=86400`;
@@ -105,7 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const uniqueSongs = [];
     console.log(songs);
     songs.forEach((song) => {
-      if (!uniqueSongs.find((uniqueSong) => uniqueSong.title === song.title && uniqueSong.artists === song.artists)) {
+      if (
+        !uniqueSongs.find(
+          (uniqueSong) =>
+            uniqueSong.title === song.title &&
+            uniqueSong.artists === song.artists
+        )
+      ) {
         uniqueSongs.push(song);
       }
     });
@@ -113,15 +131,23 @@ document.addEventListener("DOMContentLoaded", () => {
     playlist.songs = uniqueSongs;
     console.log(playlist);
 
-    const playlistTracklistElem = document.querySelector(".playlist>.tracklist");
+    const playlistTracklistElem = document.querySelector(
+      ".playlist>.tracklist"
+    );
     playlist.songs.forEach((song) => {
       const songObj = new Song(song.title, song.artists, song.coverart);
       const songElem = songObj.toHTML(false);
       console.log(songElem);
-      songElem.querySelector(".song-remove-btn>svg").addEventListener("click", buttonTrigger);
+      songElem
+        .querySelector(".song-remove-btn>svg")
+        .addEventListener("click", buttonTrigger);
 
       // check if the song is already in the playlist
-      if (!playlistTracklistElem.querySelector(`[data-title="${song.title}"][data-artists="${song.artists}"]`)) {
+      if (
+        !playlistTracklistElem.querySelector(
+          `[data-title="${song.title}"][data-artists="${song.artists}"]`
+        )
+      ) {
         playlistTracklistElem.appendChild(songElem);
       }
     });
@@ -151,14 +177,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return 0;
       });
-      const playlistTracklistElem = document.querySelector(".playlist>.tracklist");
-      songsList = songsList.filter((song) => !playlistTracklistElem.querySelector(`[data-title="${song.title}"][data-artists="${song.artists}"]`));
+      const playlistTracklistElem = document.querySelector(
+        ".playlist>.tracklist"
+      );
+      songsList = songsList.filter(
+        (song) =>
+          !playlistTracklistElem.querySelector(
+            `[data-title="${song.title}"][data-artists="${song.artists}"]`
+          )
+      );
       const resultsContainer = document.querySelector(".results");
       resultsContainer.innerHTML = "";
       songsList.forEach((song) => {
         const songElem = song.toHTML(true);
         resultsContainer.appendChild(songElem);
-        songElem.querySelector(".song-results-option>.song-add-btn>svg").addEventListener("click", buttonTrigger);
+        songElem
+          .querySelector(".song-results-option>.song-add-btn>svg")
+          .addEventListener("click", buttonTrigger);
       });
     });
   }
